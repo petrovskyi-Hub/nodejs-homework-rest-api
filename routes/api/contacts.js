@@ -1,113 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const Contacts = require('../../model/contactsModel');
+const contactsController = require('../../controller/contactsController');
 const validate = require('../../services/validation');
 
-router.get('/', async (req, res, next) => {
-  try {
-    const contacts = await Contacts.listContacts();
-    return res.json({
-      status: 'Success',
-      code: 200,
-      message: 'Contacts found',
-      data: {
-        contacts,
-      },
-    });
-  } catch (e) {
-    next(e);
-  }
-});
+router
+  .get('/', contactsController.listContacts)
+  .post('/', validate.createContact, contactsController.addContact);
 
-router.get('/:contactId', async (req, res, next) => {
-  try {
-    const contact = await Contacts.getContactById(req.params.contactId);
-    if (contact) {
-      return res.json({
-        status: 'Success',
-        code: 200,
-        message: 'Contacts found',
-        data: {
-          contact,
-        },
-      });
-    } else {
-      return res.status(404).json({
-        status: 'Error',
-        code: 404,
-        message: 'Not Found',
-      });
-    }
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.post('/', validate.createContact, async (req, res, next) => {
-  try {
-    const contact = await Contacts.addContact(req.body);
-    return res.status(201).json({
-      status: 'Success',
-      code: 201,
-      message: 'Contact successfully created',
-      data: {
-        contact,
-      },
-    });
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.delete('/:contactId', async (req, res, next) => {
-  try {
-    const contact = await Contacts.removeContact(req.params.contactId);
-    if (contact) {
-      return res.json({
-        status: 'Success',
-        code: 200,
-        message: 'Contacts deleted',
-        data: {
-          contact,
-        },
-      });
-    } else {
-      return res.status(404).json({
-        status: 'Error',
-        code: 404,
-        message: 'Not Found',
-      });
-    }
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.patch('/:contactId', validate.updateContact, async (req, res, next) => {
-  try {
-    const contact = await Contacts.updateContact(
-      req.params.contactId,
-      req.body,
-    );
-    if (contact) {
-      return res.json({
-        status: 'Success',
-        code: 200,
-        message: 'Contact updated successfully',
-        data: {
-          contact,
-        },
-      });
-    } else {
-      return res.status(404).json({
-        status: 'Error',
-        code: 404,
-        data: 'Not Found',
-      });
-    }
-  } catch (e) {
-    next(e);
-  }
-});
+router
+  .get('/:contactId', contactsController.getContactById)
+  .delete('/:contactId', contactsController.removeContact)
+  .patch(
+    '/:contactId',
+    validate.updateContact,
+    contactsController.updateContact,
+  );
 
 module.exports = router;
