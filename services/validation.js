@@ -6,6 +6,7 @@ const schemaCreateContact = Joi.object({
   phone: Joi.string()
     .pattern(/^[(][\d]{3}[)]\s[\d]{3}[-][\d]{4}/)
     .required(),
+  subscription: Joi.any().valid('free', 'pro', 'premium').optional(),
 });
 
 const schemaUpdateContact = Joi.object({
@@ -14,6 +15,16 @@ const schemaUpdateContact = Joi.object({
   phone: Joi.string()
     .pattern(/^[(][\d]{3}[)]\s[\d]{3}[-][\d]{4}/)
     .optional(),
+  subscription: Joi.any().valid('free', 'pro', 'premium').optional(),
+});
+
+const schemaValidateAuth = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(7).required(),
+});
+
+const schemaValidateUpdateSub = Joi.object({
+  subscription: Joi.any().valid('free', 'pro', 'premium').required(),
 });
 
 const validate = (schema, obj, next) => {
@@ -34,4 +45,12 @@ module.exports.createContact = (req, res, next) => {
 
 module.exports.updateContact = (req, res, next) => {
   return validate(schemaUpdateContact, req.body, next);
+};
+
+module.exports.validateAuth = (req, _res, next) => {
+  return validate(schemaValidateAuth, req.body, next);
+};
+
+module.exports.validateUpdateSub = (req, _res, next) => {
+  return validate(schemaValidateUpdateSub, req.body, next);
 };
