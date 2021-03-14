@@ -62,7 +62,7 @@ const login = async (req, res, next) => {
       data: {
         token,
         user: {
-          avatarURL: user.avatarURL,
+          avatarURL: `http://localhost:3000/images/${user.avatarURL}`,
           email: user.email,
           subscription: user.subscription,
         },
@@ -94,7 +94,7 @@ const currentUser = async (req, res, next) => {
       code: HttpCode.OK,
       data: {
         user: {
-          avatarURL: user.avatarURL,
+          avatarURL: `http://localhost:3000/images/${user.avatarURL}`,
           email: user.email,
           subscription: user.subscription,
         },
@@ -158,7 +158,7 @@ const avatars = async (req, res, next) => {
   try {
     const id = String(req.user._id);
     const avatarUrl = await saveAvatarToStatic(req);
-    await Users.updateAvatar(id, `http://localhost:3000/images/${avatarUrl}`);
+    await Users.updateAvatar(id, avatarUrl);
     return res.json({
       status: 'success',
       code: HttpCode.OK,
