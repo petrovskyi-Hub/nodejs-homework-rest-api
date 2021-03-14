@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { HttpCode } = require('./constants');
 
 const schemaCreateContact = Joi.object({
   name: Joi.string().min(3).max(30).required(),
@@ -32,7 +33,7 @@ const validate = (schema, obj, next) => {
   if (error) {
     const [{ message }] = error.details;
     return next({
-      status: 400,
+      status: HttpCode.BAD_REQUEST,
       message: `Field ${message.replace(/"/g, '')}`,
     });
   }
@@ -53,4 +54,14 @@ module.exports.validateAuth = (req, _res, next) => {
 
 module.exports.validateUpdateSub = (req, _res, next) => {
   return validate(schemaValidateUpdateSub, req.body, next);
+};
+
+module.exports.validateUploadAvatar = (req, _res, next) => {
+  if (!req.file) {
+    return next({
+      status: HttpCode.BAD_REQUEST,
+      message: 'Field of avatar with file not found',
+    });
+  }
+  next();
 };
